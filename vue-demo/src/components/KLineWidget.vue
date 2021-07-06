@@ -14,11 +14,11 @@ const supported_resolutions = [
   "5",
   "15",
   "30",
-  "60",
-  "240",
-  "D",
-  "W",
-  "M",
+  // "60",
+  // "240",
+  // "D",
+  // "W",
+  // "M",
 ];
 /**
  * @key Server 端定义字段
@@ -44,7 +44,7 @@ export default {
   data() {
     return {
       symbol: this.symbolInfo.symbol,
-      interval: "5min",
+      interval: "15min",
       widget: null,
       datafeed: new DataFeed({
         getBars: (params) => this.getBars(params),
@@ -171,10 +171,11 @@ export default {
     },
     initTradingView() {
       const symbol = this.symbol;
+      console.log(1111, symbol)
       this.widget = new TvWidget({
         // debug: true,
-        fullscreen: true,
-        symbol: symbol.toLocaleUpperCase(),
+        fullscreen: true, // 是否全屏
+        symbol: 'Bitfinex:BTC/USD', //symbol, //.toLocaleUpperCase(),
         interval: intervalMap[this.interval],
         container_id: "tv_chart_container",
         datafeed: this.datafeed,
@@ -182,6 +183,18 @@ export default {
         locale: "zh",
         theme: "Dark",
         timezone: "Asia/Shanghai",
+        disabled_features: [
+          "header_chart_type",
+          "header_indicators", //指标
+          "header_compare", // 对比
+          "header_undo_redo",
+          "header_settings", //设置按钮
+          "header_screenshot", //照相机
+          "header_fullscreen_button", 
+          "left_toolbar", //左边工具栏
+          "volume_force_overlay", //k线与销量分开
+          "timeframes_toolbar", //底部时间栏目
+        ]
       });
     },
     setSymbol(symbol) {
