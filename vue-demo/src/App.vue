@@ -8,19 +8,28 @@
           @onClick="onClick"
         />
       </div>
-     </div>
+      <div class="right-box">
+        <KLineWidget
+          v-if="!!symbolInfo.symbol"
+          :symbolInfo="symbolInfo"
+          ref="kLineWidget"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { apiGet } from "./api";
-// import { ws } from "./utils/socket";
+import { ws } from "./utils/socket";
 import KLineHeader from "./components/KLineHeader";
+import KLineWidget from "./components/KLineWidget";
 
 export default {
   name: 'App',
   components: {
     KLineHeader,
+    KLineWidget,
   },
   data() {
     return {
@@ -45,7 +54,7 @@ export default {
         this.symbol = symbol;
         this.symbolInfo = list[0];
         this.symbolList = list;
-        console.log(symbol, list) // dfusdt {...}
+        // console.log(symbol, list) // dfusdt {...}
       });
     },
     onClick(item) {
@@ -53,7 +62,7 @@ export default {
     },
   },
   created() {
-    // ws.initWebSocket();
+    ws.initWebSocket();
     this.fetchSymbolList();
   },
 }
