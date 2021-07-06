@@ -7,6 +7,7 @@
 
 <script>
 import { apiGet } from "./api";
+import { ws } from "./utils/socket";
 import HelloWorld from './components/HelloWorld.vue'
 
 export default {
@@ -42,6 +43,7 @@ export default {
     },
   },
   created() {
+    ws.initWebSocket();
     this.fetchSymbolList();
   },
 }
