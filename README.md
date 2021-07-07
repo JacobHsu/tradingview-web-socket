@@ -19,3 +19,6 @@ https://www.huobi.com/zh-cn/exchange/
 [tradingView在坑中摸出来的](https://blog.csdn.net/z657797068/article/details/100124710) `disabled_features: [`
 [TradingView 中文开发文档](https://zlq4863947.gitbook.io/tradingview/) [featuresets](https://zlq4863947.gitbook.io/tradingview/4-tu-biao-ding-zhi/featuresets)
 [TradingView配置](https://cloud.tencent.com/developer/article/1405723)
+[tradingview配置参数--参考自火币网-转载](https://www.jianshu.com/p/8d2fc260f5d5) `setResolution` `setChartType`
+
+tradingview / charting-library-examples [TVChartContainer.vue](https://github.com/tradingview/charting-library-examples/blob/master/vuejs/src/components/TVChartContainer.vue)

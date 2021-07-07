@@ -5,20 +5,20 @@
 </template>
 
 <script>
-import { apiGet } from "../api";
-import { DataFeed, widget as TvWidget } from "tradingview-api";
-import { ws } from "../utils/socket";
+import { apiGet } from '../api';
+import { DataFeed, widget as TvWidget } from 'tradingview-api';
+import { ws } from '../utils/socket';
 
 const supported_resolutions = [
-  "1",
-  "5",
-  "15",
-  "30",
-  // "60",
-  // "240",
-  // "D",
-  // "W",
-  // "M",
+  '1',
+  '5',
+  '15',
+  '30',
+  '60',
+  '240',
+  'D',
+  'W',
+  'M',
 ];
 /**
  * @key Server 端定义字段
@@ -26,25 +26,25 @@ const supported_resolutions = [
  */
 // 1min, 5min, 15min, 30min, 60min, 4hour, 1day, 1mon, 1week, 1year
 const intervalMap = {
-  "1min": "1",
-  "5min": "5",
-  "15min": "15",
-  "30min": "30",
-  "60min": "60",
-  "4hour": "240",
-  "1day": "D",
-  "1week": "W",
-  "1mon": "M",
+  '1min': '1',
+  '5min': '5',
+  '15min': '15',
+  '30min': '30',
+  '60min': '60',
+  '4hour': '240',
+  '1day': 'D',
+  '1week': 'W',
+  '1mon': 'M',
 };
 export default {
-  name: "KLineWidget",
+  name: 'KLineWidget',
   props: {
     symbolInfo: Object,
   },
   data() {
     return {
       symbol: this.symbolInfo.symbol,
-      interval: "15min",
+      interval: '15min',
       widget: null,
       datafeed: new DataFeed({
         getBars: (params) => this.getBars(params),
@@ -69,14 +69,14 @@ export default {
           full_name: symbol.toLocaleUpperCase(),
           description: symbol.toLocaleUpperCase(),
           type: symbol,
-          session: "24x7",
-          exchange: "HuoBi",
+          session: '24x7',
+          exchange: 'HuoBi',
           listed_exchange: symbol,
-          timezone: "Asia/Shanghai",
-          format: "price",
-          pricescale: Math.pow(10, info["price-precision"]),
+          timezone: 'Asia/Shanghai',
+          format: 'price',
+          pricescale: Math.pow(10, info['price-precision']),
           minmov: 1,
-          volume_precision: info["value-precision"],
+          volume_precision: info['value-precision'],
           has_intraday: true,
           supported_resolutions: supported_resolutions,
         });
@@ -102,7 +102,7 @@ export default {
           }
         }
       }
-      const res = await apiGet("history_kline", void 0, {
+      const res = await apiGet('history_kline', void 0, {
         params: {
           symbol: symbol,
           period: this.interval,
@@ -149,7 +149,7 @@ export default {
       ws.subscribe(
         `market.${symbol}.kline.${this.interval}`,
         {
-          id: "react-tv",
+          id: 'react-tv',
           sub: `market.${symbol}.kline.${this.interval}`,
         },
         (data) => {
@@ -171,37 +171,122 @@ export default {
     },
     initTradingView() {
       const symbol = this.symbol;
-      console.log(1111, symbol)
-      this.widget = new TvWidget({
+      let widget = new TvWidget({
         // debug: true,
         fullscreen: true, // 是否全屏
-        symbol: 'Bitfinex:BTC/USD', //symbol, //.toLocaleUpperCase(),
-        interval: intervalMap[this.interval],
-        container_id: "tv_chart_container",
+        symbol: symbol.toLocaleUpperCase(),
+        interval: intervalMap[this.interval], // 默认K线周期
+        container_id: 'tv_chart_container',
         datafeed: this.datafeed,
-        library_path: "/charting_library/",
-        locale: "zh",
-        theme: "Dark",
-        timezone: "Asia/Shanghai",
+        library_path: '/charting_library/',
+        locale: 'zh',
+        theme: 'Dark',
+        timezone: 'Asia/Shanghai',
         disabled_features: [
-          "header_chart_type",
-          "header_indicators", //指标
-          "header_compare", // 对比
-          "header_undo_redo",
-          "header_settings", //设置按钮
-          "header_screenshot", //照相机
-          "header_fullscreen_button", 
-          "left_toolbar", //左边工具栏
-          "volume_force_overlay", //k线与销量分开
-          "timeframes_toolbar", //底部时间栏目
-        ]
+          // "header_resolutions",
+          'header_chart_type',
+          'header_indicators', //指标
+          'header_compare', // 对比
+          'header_undo_redo',
+          'header_settings', //设置按钮
+          'header_screenshot', //照相机
+          'header_fullscreen_button',
+          'left_toolbar', //左边工具栏
+          'volume_force_overlay', //k线与销量分开
+          'timeframes_toolbar', //底部时间栏目
+        ],
+        enabled_features: [
+          'hide_last_na_study_output',
+          'move_logo_to_main_pane',
+        ],
+        overrides: {
+          'paneProperties.vertGridProperties.color': 'rgba(0,0,0,.1)',
+          'paneProperties.horzGridProperties.color': 'rgba(0,0,0,.1)',
+          volumePaneSize: 'small',
+        },
       });
+
+      widget.onChartReady(function() {
+        widget.chart().createStudy('Moving Average', false, false, [5], null, {
+          'plot.color': '#EDEDED',
+        });
+        widget.chart().createStudy('Moving Average', false, false, [10], null, {
+          'plot.color': '#ffe000',
+        });
+        widget.chart().createStudy('Moving Average', false, false, [30], null, {
+          'plot.color': '#2026dc',
+        });
+        widget.chart().createStudy('Moving Average', false, false, [60], null, {
+          'plot.color': '#00adff',
+        });
+
+        const btnList = [
+          {
+            label: '分时',
+            resolution: localStorage.resolution || '1',
+            chartType: 3,
+          },
+          {
+            label: '1分',
+            resolution: '1',
+            chartType: 1,
+          },
+          {
+            label: '5分',
+            resolution: '5',
+            chartType: 1,
+          },
+          {
+            label: '15分',
+            resolution: '15',
+            chartType: 1,
+          },
+          {
+            label: '30分',
+            resolution: '30',
+            chartType: 1,
+          },
+          {
+            label: '1小时',
+            resolution: '60',
+            chartType: 1,
+          },
+          {
+            label: '1日',
+            resolution: '1D',
+            chartType: 1,
+          },
+          {
+            label: '1周',
+            resolution: '1W',
+            chartType: 1,
+          },
+          {
+            label: '1月',
+            resolution: '1M',
+            chartType: 1,
+          },
+        ];
+        btnList.forEach(function(item) {
+          let button = widget.createButton();
+          button.addEventListener('click', () => {
+            widget
+              .chart()
+              .setResolution(item.resolution, function onReadyCallback() {});
+            if (item.chartType != widget.chart().chartType()) {
+              widget.chart().setChartType(item.chartType);
+            }
+          });
+          button.innerHTML = item.label;
+        });
+      });
+      this.widget = widget;
     },
     setSymbol(symbol) {
       this.unsubscribeKLine();
       this.symbol = symbol;
       this.widget?.setSymbol(symbol, intervalMap[this.interval], () => {
-        console.log("------setSymbol---------", this.symbol);
+        console.log('------setSymbol---------', this.symbol);
       });
     },
   },
